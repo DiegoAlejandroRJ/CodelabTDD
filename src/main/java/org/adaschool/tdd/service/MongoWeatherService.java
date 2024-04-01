@@ -1,13 +1,16 @@
 package org.adaschool.tdd.service;
 
 import org.adaschool.tdd.controller.weather.dto.WeatherReportDto;
+import org.adaschool.tdd.exception.WeatherReportNotFoundException;
 import org.adaschool.tdd.repository.WeatherReportRepository;
 import org.adaschool.tdd.repository.document.GeoLocation;
 import org.adaschool.tdd.repository.document.WeatherReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MongoWeatherService
@@ -24,13 +27,20 @@ public class MongoWeatherService
     @Override
     public WeatherReport report( WeatherReportDto weatherReportDto )
     {
-        return null;
+        GeoLocation geoLocation = weatherReportDto.getGeoLocation();
+        double temperature = weatherReportDto.getTemperature();
+        double humidity = weatherReportDto.getHumidity();
+        String reporter = weatherReportDto.getReporter();
+        Date created = weatherReportDto.getCreated();
+        WeatherReport newWeatherReport = new WeatherReport(geoLocation, temperature, humidity, reporter, created);
+        return repository.save(newWeatherReport);
     }
 
     @Override
     public WeatherReport findById( String id )
     {
-        throw new RuntimeException( "Implement this method" );
+        Optional<WeatherReport> report = repository.findById(id);
+        return report.orElseThrow(WeatherReportNotFoundException::new);
     }
 
     @Override
